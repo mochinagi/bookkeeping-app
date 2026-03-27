@@ -1,10 +1,11 @@
+import React, { memo } from 'react';
 import { SymbolView, SymbolViewProps, SymbolWeight } from 'expo-symbols';
 import { StyleProp, ViewStyle } from 'react-native';
 
-export function IconSymbol({
+export const IconSymbol = memo(function IconSymbol({
   name,
   size = 24,
-  color,
+  color = '#000',
   style,
   weight = 'regular',
 }: {
@@ -25,7 +26,7 @@ export function IconSymbol({
           width: size,
           height: size,
         },
-        style,
+        ...(Array.isArray(style) ? style : [style]),
       ]}
     />
   );
