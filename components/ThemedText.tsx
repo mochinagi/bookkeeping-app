@@ -1,14 +1,17 @@
+import { memo } from 'react';
 import { StyleSheet, Text, type TextProps } from 'react-native';
 
 import { useThemeColor } from '@/hooks/useThemeColor';
 
+type TextType = 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
+
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
   darkColor?: string;
-  type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';
+  type?: TextType;
 };
 
-export function ThemedText({
+export const ThemedText = memo(function ThemedText({
   style,
   lightColor,
   darkColor,
@@ -16,22 +19,19 @@ export function ThemedText({
   ...rest
 }: ThemedTextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  const isLink = type === 'link';
 
   return (
     <Text
       style={[
-        { color },
-        type === 'default' ? styles.default : undefined,
-        type === 'title' ? styles.title : undefined,
-        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
-        type === 'subtitle' ? styles.subtitle : undefined,
-        type === 'link' ? styles.link : undefined,
-        style,
+        { color: isLink ? '#0a7ea4' : color },
+        typeStyles[type],
+        ...(Array.isArray(style) ? style : [style]),
       ]}
       {...rest}
     />
   );
-}
+});
 
 const styles = StyleSheet.create({
   default: {
@@ -55,6 +55,13 @@ const styles = StyleSheet.create({
   link: {
     lineHeight: 30,
     fontSize: 16,
-    color: '#0a7ea4',
   },
 });
+
+const typeStyles = {
+  default: styles.default,
+  title: styles.title,
+  defaultSemiBold: styles.defaultSemiBold,
+  subtitle: styles.subtitle,
+  link: styles.link,
+};
