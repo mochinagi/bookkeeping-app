@@ -7,24 +7,27 @@ import Animated, {
   useAnimatedStyle,
   useScrollViewOffset,
 } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ThemedView } from '@/components/ThemedView';
 import { useBottomTabOverflow } from '@/components/ui/TabBarBackground';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 type Props = PropsWithChildren<{
-  headerImage: ReactElement;
-  headerBackgroundColor: { dark: string; light: string };
+  headerImage?: ReactElement;
+  headerBackgroundColor?: { dark: string; light: string };
   headerHeight?: number;
   contentPadding?: number;
+  safeArea?: boolean;
 }>;
 
 export default function ParallaxScrollView({
   children,
   headerImage,
-  headerBackgroundColor,
+  headerBackgroundColor = { light: '#fff', dark: '#000' },
   headerHeight = 250,
-  contentPadding = 32,
+  contentPadding = 16,
+  safeArea = true,
 }: Props) {
   const colorScheme = useColorScheme() ?? 'light';
   const backgroundColor = headerBackgroundColor[colorScheme];
@@ -56,27 +59,34 @@ export default function ParallaxScrollView({
     };
   });
 
+  const Container = safeArea ? SafeAreaView : ThemedView;
+
   return (
-    <ThemedView style={styles.container}>
+    <Container style={styles.container}>
       <Animated.ScrollView
         ref={scrollRef}
         scrollEventThrottle={16}
         scrollIndicatorInsets={{ bottom }}
         contentContainerStyle={{ paddingBottom: bottom }}>
-        <Animated.View
-          style={[
-            styles.header,
-            { backgroundColor, height: headerHeight },
-            headerAnimatedStyle,
-          ]}>
-          {headerImage}
-        </Animated.View>
 
+        {/* Header */}
+        {headerImage && (
+          <Animated.View
+            style={[
+              styles.header,
+              { backgroundColor, height: headerHeight },
+              headerAnimatedStyle,
+            ]}>
+            {headerImage}
+          </Animated.View>
+        )}
+
+        {/* Content */}
         <ThemedView style={[styles.content, { padding: contentPadding }]}>
           {children}
         </ThemedView>
       </Animated.ScrollView>
-    </ThemedView>
+    </Container>
   );
 }
 
@@ -90,6 +100,5 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     gap: 16,
-    overflow: 'hidden',
   },
 });
