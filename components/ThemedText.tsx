@@ -19,14 +19,14 @@ export const ThemedText = memo(function ThemedText({
   ...rest
 }: ThemedTextProps) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
-  const isLink = type === 'link';
+  const linkColor = useThemeColor({ light: lightColor, dark: darkColor }, 'tint');
 
   return (
     <Text
       style={[
-        { color: isLink ? '#0a7ea4' : color },
+        { color: type === 'link' ? linkColor : color },
         typeStyles[type],
-        ...(Array.isArray(style) ? style : [style]),
+        ...(style ? (Array.isArray(style) ? style : [style]) : []),
       ]}
       {...rest}
     />
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const typeStyles = {
+const typeStyles: Record<TextType, any> = {
   default: styles.default,
   title: styles.title,
   defaultSemiBold: styles.defaultSemiBold,
